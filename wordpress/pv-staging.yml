@@ -1,0 +1,19 @@
+# Create PersistentVolume
+# change the ip of NFS server
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: wordpress-persistent-storage
+  labels:
+    app: wordpress
+    tier: frontend
+  namespace: staging
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    server: fs-4abbe632.efs.us-east-2.amazonaws.com
+    # Exported path of your NFS server
+    path: "/"

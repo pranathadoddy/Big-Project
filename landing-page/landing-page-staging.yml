@@ -1,0 +1,54 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: landing-page-sv
+  namespace: staging
+spec:
+  type: NodePort
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+      name: tcp-80
+  selector:
+      run: landing-page
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+ name: landing-page
+ namespace: staging
+spec:
+  selector:
+    matchLabels:
+      run: landing-page
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        run: landing-page
+    spec:
+      containers:
+      - name: landing-page
+        image: dap123/landing-page-staging:latest
+        ports:
+          - containerPort: 80
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: landing-page-ingress
+  namespace: staging
+  annotations:
+     nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - host: stagingdoddy.test-cilsy.my.id 
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: landing-page-sv
+          servicePort: 80
